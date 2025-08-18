@@ -1,0 +1,264 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+
+import '../../providers/cart_provider.dart';
+import '../../providers/product_provider.dart';
+import '../product/product_detail_screen.dart';
+
+class ProductScreen extends StatefulWidget {
+  final String category;
+  const ProductScreen({super.key, required this.category});
+
+  @override
+  State<ProductScreen> createState() => _ProductScreenState();
+}
+
+class _ProductScreenState extends State<ProductScreen> {
+  late Future<void> _loadProducts;
+
+    @override
+    void initState() {
+      super.initState();
+      _loadProducts = Provider.of<ProductProvider>(context, listen: false).fetchProducts();
+    }
+
+
+  
+
+@override
+Widget build(BuildContext context) {
+  final cartProvider = Provider.of<CartProvider>(context, listen: false);
+  final productProvider = Provider.of<ProductProvider>(context, listen: false);
+
+  return Scaffold(
+    appBar: AppBar(title: Text('Sản phẩm: ${widget.category}')),
+    body: FutureBuilder(
+      future: _loadProducts,
+      builder: (ctx, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final products = Provider.of<ProductProvider>(context).getProductsByCategory(widget.category);
+
+        if (products.isEmpty) {
+          return const Center(child: Text('Không có sản phẩm nào.'));
+        }
+
+        return GridView.builder(
+          padding: const EdgeInsets.all(16),
+          gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: 200,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            childAspectRatio: 0.63,
+          ),
+          itemCount: products.length,
+          itemBuilder: (ctx, index) {
+            final product = products[index];
+            return GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ProductDetail(product: product),
+                  ),
+                );
+              },
+              child: Card(
+                clipBehavior: Clip.antiAlias,
+                elevation: 6,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: Image.network(
+                        product.imageUrl,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Text(
+                        product.name,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: Text(
+                        '${product.price.toStringAsFixed(0)} đ',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.deepPurple,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.add_shopping_cart, size: 10),
+                        label: const Text("Thêm vào giỏ hàng", style: TextStyle(fontSize: 10)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.deepPurple.shade200,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(36, 36),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        onPressed: () {
+                          cartProvider.addToCart(product);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('${product.name} đã được thêm vào giỏ hàng.'),
+                              duration: const Duration(milliseconds: 1200),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    ),
+  );
+}
+
+}
+
+
+/*class ProductScreen extends StatefulWidget {
+  final String category;
+  const ProductScreen({super.key, required this.category});
+
+  @override
+  State<ProductScreen> createState() => _ProductScreenState();
+}
+
+class _ProductScreenState extends State<ProductScreen> {
+  late Future<void> _loadProducts;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProducts = Provider.of<ProductProvider>(context, listen: false).fetchProducts();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    final productProvider = Provider.of<ProductProvider>(context);
+    final products = productProvider.getProductsByCategory(widget.category);
+
+    return Scaffold(
+      appBar: AppBar(title: Text('Sản phẩm: ${widget.category}')),
+      body: FutureBuilder(
+        future: _loadProducts,
+        builder: (ctx, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (products.isEmpty) {
+            return const Center(child: Text('Không có sản phẩm nào.'));
+          }
+
+          return GridView.builder(
+            padding: const EdgeInsets.all(16),
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 200,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 0.63,
+            ),
+            itemCount: products.length,
+            itemBuilder: (ctx, index) {
+              final product = products[index];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ProductDetail(product: product),
+                    ),
+                  );
+                },
+                child: Card(
+                  clipBehavior: Clip.antiAlias,
+                  elevation: 6,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(
+                        child: Image.network(
+                          product.imageUrl,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Text(
+                          product.name,
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Text(
+                          '${product.price.toStringAsFixed(0)} đ',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepPurple,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.add_shopping_cart, size: 10),
+                          label: const Text("Thêm vào giỏ hàng", style: TextStyle(fontSize: 10)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurple.shade200,
+                            foregroundColor: Colors.white,
+                            minimumSize: const Size(36, 36),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          onPressed: () {
+                            cartProvider.addToCart(product);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('${product.name} đã được thêm vào giỏ hàng.'),
+                                duration: const Duration(milliseconds: 1200),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+*/
