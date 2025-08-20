@@ -34,7 +34,7 @@ class ProductDetail extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            '${product.price.toStringAsFixed(0)} đ',
+            '${currencyFormat.format(product.price)} VNĐ',
             style: const TextStyle(fontSize: 20, color: Colors.deepPurple),
             textAlign: TextAlign.center,
           ),
@@ -93,7 +93,7 @@ class ProductDetail extends StatelessWidget {
 
           const SizedBox(height: 16),
 
-          if (quantity > 0)
+          if (quantity > 0) 
             Column(
               children: [
                 const Text(
