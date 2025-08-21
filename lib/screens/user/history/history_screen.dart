@@ -106,7 +106,7 @@ class HistoryScreen extends StatelessWidget {
                                 title: Text(item.product.name),
                                 subtitle: Text('Số lượng: ${item.quantity}'),
                                 trailing: Text(
-                                  '${currencyFormat.format(item.product.price * item.quantity)} đ',
+                                  '${currencyFormat.format(item.product.price * item.quantity)} VNĐ',
                                   style: const TextStyle(
                                     color: Colors.deepPurple,
                                     fontWeight: FontWeight.w600,

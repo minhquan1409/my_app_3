@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
+import '../../../models/product.dart';
 class OrderTrackingScreen extends StatelessWidget {
   const OrderTrackingScreen({super.key});
 
@@ -132,7 +132,7 @@ class OrderTrackingScreen extends StatelessWidget {
                                         ),
                                       ),
                                       Text(
-                                        "$productPrice VND",
+                                        '${currencyFormat.format(productPrice)} VNĐ',
                                         style:
                                             const TextStyle(fontSize: 12),
                                       ),
@@ -191,6 +191,4 @@ class OrderTrackingScreen extends StatelessWidget {
       ),
     );
   }
-
-
 }

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../providers/user_provider.dart';
 import 'person_info_form_screen.dart';
+import '../../../models/product.dart';
 
 class PersonInfoScreen extends StatefulWidget {
   const PersonInfoScreen({super.key});
@@ -138,7 +139,7 @@ class _PersonInfoScreenState extends State<PersonInfoScreen> {
                             ),
                             ListTile(
                               leading: const Icon(Icons.attach_money, color: Colors.green),
-                              title: Text('Tổng chi tiêu: ${user.totalSpent.toStringAsFixed(0)} VND'),
+                              title: Text('Tổng chi tiêu: ${currencyFormat.format(user.totalSpent)} VNĐ'),
                             ),
                           ],
                         ),
